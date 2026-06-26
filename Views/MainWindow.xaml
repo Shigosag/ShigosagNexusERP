@@ -1,0 +1,106 @@
+<Window x:Class="ShigosagNexusERP.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Shigosag Nexus Enterprise | Global Command Center" Height="850" Width="1400"
+        Background="#0F0F0F" WindowStartupLocation="CenterScreen">
+    
+    <!-- Local Icon Highlight Style: Ensures Icons stay Pink when selected -->
+    <Window.Resources>
+        <Style x:Key="SidebarIconStyle" TargetType="Path">
+            <Setter Property="Fill" Value="#AAAAAA"/>
+            <Setter Property="Stretch" Value="Uniform"/>
+            <Setter Property="Width" Value="18"/>
+            <Setter Property="Margin" Value="0,0,15,0"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsChecked, RelativeSource={RelativeSource AncestorType=RadioButton}}" Value="True">
+                    <Setter Property="Fill" Value="{StaticResource PrimaryBrush}"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="260"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Sidebar Navigation -->
+        <Border Grid.Column="0" Background="#161616" CornerRadius="0,25,25,0">
+            <DockPanel Margin="15">
+                <StackPanel DockPanel.Dock="Top">
+                    <TextBlock Text="SHIGOSAG" Foreground="{StaticResource PrimaryBrush}" FontSize="26" FontWeight="Black" HorizontalAlignment="Center" Margin="0,20,0,5"/>
+                    <TextBlock Text="NEXUS ENTERPRISE" Foreground="#888" FontSize="10" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,40"/>
+                    
+                    <!-- 1. Dashboard -->
+                    <RadioButton GroupName="Nav" IsChecked="True" Style="{StaticResource NavButtonStyle}" Command="{Binding NavigateToDashboardCommand}">
+                        <StackPanel Orientation="Horizontal">
+                            <Path Data="{StaticResource IconDashboard}" Style="{StaticResource SidebarIconStyle}"/>
+                            <TextBlock Text="Dashboard" Foreground="White" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </RadioButton>
+
+                    <!-- 2. Inventory -->
+                    <RadioButton GroupName="Nav" Style="{StaticResource NavButtonStyle}" Command="{Binding NavigateToInventoryCommand}">
+                        <StackPanel Orientation="Horizontal">
+                            <Path Data="{StaticResource IconInventory}" Style="{StaticResource SidebarIconStyle}"/>
+                            <TextBlock Text="Inventory" Foreground="White" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </RadioButton>
+
+                    <!-- 3. Sales & Orders -->
+                    <RadioButton GroupName="Nav" Style="{StaticResource NavButtonStyle}" Command="{Binding NavigateToSalesCommand}">
+                        <StackPanel Orientation="Horizontal">
+                            <Path Data="{StaticResource IconSales}" Style="{StaticResource SidebarIconStyle}"/>
+                            <TextBlock Text="Sales &amp; Orders" Foreground="White" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </RadioButton>
+
+                    <!-- 4. CRM / Clients -->
+                    <RadioButton GroupName="Nav" Style="{StaticResource NavButtonStyle}" Command="{Binding NavigateToCRMCommand}">
+                        <StackPanel Orientation="Horizontal">
+                            <Path Data="{StaticResource IconCRM}" Style="{StaticResource SidebarIconStyle}"/>
+                            <TextBlock Text="CRM / Customers" Foreground="White" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </RadioButton>
+
+                    <!-- 5. HR / Employees -->
+                    <RadioButton GroupName="Nav" Style="{StaticResource NavButtonStyle}" Command="{Binding NavigateToHRCommand}">
+                        <StackPanel Orientation="Horizontal">
+                            <Path Data="{StaticResource IconHR}" Style="{StaticResource SidebarIconStyle}"/>
+                            <TextBlock Text="HR / Employees" Foreground="White" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </RadioButton>
+
+                    <!-- 6. Financial Reports (Modernized Module) -->
+                    <RadioButton GroupName="Nav" Style="{StaticResource NavButtonStyle}" Command="{Binding NavigateToFinanceCommand}">
+                        <StackPanel Orientation="Horizontal">
+                            <Path Data="{StaticResource IconSales}" Style="{StaticResource SidebarIconStyle}" Opacity="0.8"/>
+                            <TextBlock Text="Financial Reports" Foreground="White" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </RadioButton>
+                </StackPanel>
+                
+                <StackPanel DockPanel.Dock="Bottom">
+                    <Separator Background="#222" Margin="10,0,10,10"/>
+                    
+                    <!-- 7. Global Settings -->
+                    <RadioButton GroupName="Nav" Style="{StaticResource NavButtonStyle}" Command="{Binding NavigateToSettingsCommand}">
+                        <TextBlock Text="Global Settings" Foreground="#666" Margin="33,0,0,0"/>
+                    </RadioButton>
+                    
+                    <TextBlock Text="v1.0.4-Stable" Foreground="#444" FontSize="9" HorizontalAlignment="Center" Margin="0,10,0,5"/>
+                    <TextBlock Text="OFFERED BY SHIGOSAG" Foreground="{StaticResource PrimaryBrush}" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,10" Opacity="0.6"/>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <!-- Main Workspace Area -->
+        <Grid Grid.Column="1" Margin="25">
+            <ContentControl Content="{Binding CurrentView}"/>
+        </Grid>
+    </Grid>
+</Window>
