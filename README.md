@@ -127,6 +127,7 @@ The system includes a Nexus Bootloader with global exception handling. If the da
 
 - **Offered by Shigosag** 
 - Portions of code generated with AI support
+  
 *Empowering enterprises through high-performance software architecture.*
 ---
 
