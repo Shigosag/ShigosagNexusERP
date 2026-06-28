@@ -5,6 +5,14 @@
 ![Nexus Command Center](Screenshots/dashboard.png)
 ![Nexus Command Center](Screenshots/dashboard2.png)
 
+**Timestamps:**
+- 0:00 - Executable Launch & Authentication
+- 0:17 - Nexus Command Center (Analytics)
+- 0:44 - Sales & Inventory Modules
+- 1:00 - HR & CRM Modules
+- 1:09 - Finance & Settings
+- 1:43 - GitHub Repository Overview
+
 ## 🚀 Key Features
 
 ### 📊 Intelligence & Visualization
@@ -64,7 +72,6 @@ ShigosagNexusERP/
 │   ├── ButtonStyles.xaml
 │   └── TextStyles.xaml
 └── README.md
-    
 ```
 
 ----
@@ -79,11 +86,6 @@ ShigosagNexusERP/
 | :---: | :---: |
 | ![Sales Intelligence](Screenshots/sales.png) | ![CRM Clients](Screenshots/crm.png) |
 
-**Timestamps:**
-- 0:00 - Executable Launch & Authentication
-- 0:45 - Nexus Command Center (Analytics)
-- 1:30 - HR & Inventory Modules
-- 2:30 - GitHub Repository Overview
 ---
 
 ## 💻 Tech Stack
