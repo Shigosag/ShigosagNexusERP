@@ -79,6 +79,11 @@ ShigosagNexusERP/
 | :---: | :---: |
 | ![Sales Intelligence](Screenshots/sales.png) | ![CRM Clients](Screenshots/crm.png) |
 
+**Timestamps:**
+- 0:00 - Executable Launch & Authentication
+- 0:45 - Nexus Command Center (Analytics)
+- 1:30 - HR & Inventory Modules
+- 2:30 - GitHub Repository Overview
 ---
 
 ## 💻 Tech Stack
