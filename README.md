@@ -5,14 +5,19 @@
 ![Nexus Command Center](Screenshots/dashboard.png)
 ![Nexus Command Center](Screenshots/dashboard2.png)
 
-https://github.com/user-attachments/assets/257bea57-9096-4529-a66f-2b27f856b13c
+### 🎥 System Walkthrough & Demo
+
+<div align="center">
+  <video src="https://github.com/user-attachments/assets/257bea57-9096-4529-a66f-2b27f856b13c" width="100%" controls></video>
+</div>
+
 **Timestamps:**
-- 0:00 - Executable Launch & Authentication
-- 0:17 - Nexus Command Center (Analytics)
-- 0:42 - Sales & Inventory Modules
-- 0:53 - HR & CRM Modules
-- 1:03 - Finance & Settings
-- 1:15 - GitHub Repository Overview
+- **0:00** - Executable Launch & Authentication
+- **0:17** - Nexus Command Center (Analytics)
+- **0:42** - Sales & Inventory Modules
+- **0:53** - HR & CRM Modules
+- **1:03** - Finance & Settings
+- **1:15** - GitHub Repository Overview
 
 ## 🚀 Key Features
 
