@@ -1,5 +1,8 @@
 # 💖 Shigosag Nexus Enterprise ERP
 
+[![C#](https://img.shields.io/badge/c%23-.NET%208.0-purple)](https://dotnet.microsoft.com/)  
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 **Shigosag Nexus Enterprise** is a high-density, production-ready C# WPF Desktop Application built for modern corporate management. Engineered on .NET 8, it features a sophisticated "Command Center" with custom Bezier-curved data visualization and high-performance telemetry.
 
 ![Nexus Command Center](Screenshots/dashboard.png)
