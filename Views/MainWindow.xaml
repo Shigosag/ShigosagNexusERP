@@ -4,10 +4,10 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="Shigosag Nexus Enterprise | Global Command Center" Height="850" Width="1400"
+        Title="Shigosag Nexus Enterprise | Global Command Center (Production Edition)" 
+        Height="900" Width="1440" MinHeight="750" MinWidth="1100"
         Background="#0F0F0F" WindowStartupLocation="CenterScreen">
-    
-    <!-- Local Icon Highlight Style: Ensures Icons stay Pink when selected -->
+
     <Window.Resources>
         <Style x:Key="SidebarIconStyle" TargetType="Path">
             <Setter Property="Fill" Value="#AAAAAA"/>
@@ -33,9 +33,8 @@
             <DockPanel Margin="15">
                 <StackPanel DockPanel.Dock="Top">
                     <TextBlock Text="SHIGOSAG" Foreground="{StaticResource PrimaryBrush}" FontSize="26" FontWeight="Black" HorizontalAlignment="Center" Margin="0,20,0,5"/>
-                    <TextBlock Text="NEXUS ENTERPRISE" Foreground="#888" FontSize="10" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,40"/>
-                    
-                    <!-- 1. Dashboard -->
+                    <TextBlock Text="NEXUS ENTERPRISE" Foreground="#888" FontSize="10" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,30"/>
+
                     <RadioButton GroupName="Nav" IsChecked="True" Style="{StaticResource NavButtonStyle}" Command="{Binding NavigateToDashboardCommand}">
                         <StackPanel Orientation="Horizontal">
                             <Path Data="{StaticResource IconDashboard}" Style="{StaticResource SidebarIconStyle}"/>
@@ -43,7 +42,6 @@
                         </StackPanel>
                     </RadioButton>
 
-                    <!-- 2. Inventory -->
                     <RadioButton GroupName="Nav" Style="{StaticResource NavButtonStyle}" Command="{Binding NavigateToInventoryCommand}">
                         <StackPanel Orientation="Horizontal">
                             <Path Data="{StaticResource IconInventory}" Style="{StaticResource SidebarIconStyle}"/>
@@ -51,7 +49,6 @@
                         </StackPanel>
                     </RadioButton>
 
-                    <!-- 3. Sales & Orders -->
                     <RadioButton GroupName="Nav" Style="{StaticResource NavButtonStyle}" Command="{Binding NavigateToSalesCommand}">
                         <StackPanel Orientation="Horizontal">
                             <Path Data="{StaticResource IconSales}" Style="{StaticResource SidebarIconStyle}"/>
@@ -59,7 +56,6 @@
                         </StackPanel>
                     </RadioButton>
 
-                    <!-- 4. CRM / Clients -->
                     <RadioButton GroupName="Nav" Style="{StaticResource NavButtonStyle}" Command="{Binding NavigateToCRMCommand}">
                         <StackPanel Orientation="Horizontal">
                             <Path Data="{StaticResource IconCRM}" Style="{StaticResource SidebarIconStyle}"/>
@@ -67,7 +63,6 @@
                         </StackPanel>
                     </RadioButton>
 
-                    <!-- 5. HR / Employees -->
                     <RadioButton GroupName="Nav" Style="{StaticResource NavButtonStyle}" Command="{Binding NavigateToHRCommand}">
                         <StackPanel Orientation="Horizontal">
                             <Path Data="{StaticResource IconHR}" Style="{StaticResource SidebarIconStyle}"/>
@@ -75,32 +70,68 @@
                         </StackPanel>
                     </RadioButton>
 
-                    <!-- 6. Financial Reports (Modernized Module) -->
                     <RadioButton GroupName="Nav" Style="{StaticResource NavButtonStyle}" Command="{Binding NavigateToFinanceCommand}">
                         <StackPanel Orientation="Horizontal">
                             <Path Data="{StaticResource IconSales}" Style="{StaticResource SidebarIconStyle}" Opacity="0.8"/>
-                            <TextBlock Text="Financial Reports" Foreground="White" VerticalAlignment="Center"/>
+                            <TextBlock Text="Financial Intelligence" Foreground="White" VerticalAlignment="Center"/>
                         </StackPanel>
                     </RadioButton>
                 </StackPanel>
-                
+
                 <StackPanel DockPanel.Dock="Bottom">
                     <Separator Background="#222" Margin="10,0,10,10"/>
-                    
-                    <!-- 7. Global Settings -->
                     <RadioButton GroupName="Nav" Style="{StaticResource NavButtonStyle}" Command="{Binding NavigateToSettingsCommand}">
-                        <TextBlock Text="Global Settings" Foreground="#666" Margin="33,0,0,0"/>
+                        <TextBlock Text="System Settings" Foreground="#888" Margin="33,0,0,0"/>
                     </RadioButton>
-                    
-                    <TextBlock Text="v1.0.4-Stable" Foreground="#444" FontSize="9" HorizontalAlignment="Center" Margin="0,10,0,5"/>
-                    <TextBlock Text="OFFERED BY SHIGOSAG" Foreground="{StaticResource PrimaryBrush}" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,10" Opacity="0.6"/>
+
+                    <TextBlock Text="v2.0.0-PostgreSQL-JWT" Foreground="#555" FontSize="9" HorizontalAlignment="Center" Margin="0,10,0,5"/>
+                    <TextBlock Text="OFFERED BY SHIGOSAG" Foreground="{StaticResource PrimaryBrush}" FontSize="8" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,10" Opacity="0.7"/>
                 </StackPanel>
             </DockPanel>
         </Border>
 
         <!-- Main Workspace Area -->
-        <Grid Grid.Column="1" Margin="25">
-            <ContentControl Content="{Binding CurrentView}"/>
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Top Header Shell with User Badge & Notification Bar -->
+            <Border Grid.Row="0" Background="#141414" Padding="25,15" BorderBrush="#222" BorderThickness="0,0,0,1">
+                <DockPanel LastChildFill="False">
+                    <TextBlock Text="{Binding ActiveViewName}" Foreground="White" FontSize="18" FontWeight="Bold" VerticalAlignment="Center"/>
+
+                    <!-- User and Security Claims Badge -->
+                    <Border DockPanel.Dock="Right" Background="#1E1E1E" CornerRadius="8" Padding="12,6" BorderBrush="#333" BorderThickness="1">
+                        <StackPanel Orientation="Horizontal">
+                            <Ellipse Fill="LimeGreen" Width="8" Height="8" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding AuthenticatedUser}" Foreground="#EEE" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                            <TextBlock Text=" [JWT Active]" Foreground="{StaticResource PrimaryBrush}" FontSize="10" FontWeight="Bold" Margin="6,0,0,0" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+                </DockPanel>
+            </Border>
+
+            <!-- Content Area -->
+            <Grid Grid.Row="1" Margin="25">
+                <ContentControl Content="{Binding CurrentView}"/>
+            </Grid>
+
+            <!-- Modern Non-blocking Toast Notification (Replaces Browser/System Message Dialogs) -->
+            <Border Grid.Row="1" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,15,30,0"
+                    Background="#222222" CornerRadius="10" Padding="16,12" BorderThickness="1.5"
+                    BorderBrush="{Binding ToastColor}" MaxWidth="450"
+                    Visibility="{Binding IsToastVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{Binding ToastMessage}" Foreground="White" FontSize="13" FontWeight="SemiBold" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                    <Button Grid.Column="1" Content="✕" Background="Transparent" Foreground="#888" BorderThickness="0" Margin="15,0,0,0" Cursor="Hand" Command="{Binding DismissToastCommand}"/>
+                </Grid>
+            </Border>
         </Grid>
     </Grid>
 </Window>
