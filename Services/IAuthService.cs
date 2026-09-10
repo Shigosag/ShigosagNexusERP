@@ -3,7 +3,13 @@ using ShigosagNexusERP.Models;
 
 namespace ShigosagNexusERP.Services;
 
+public record AuthResult(bool IsSuccess, string? Token, User? User, string? ErrorMessage);
+
 public interface IAuthService
 {
-    Task<User?> LoginAsync(string username, string password);
+    Task<AuthResult> LoginAsync(string username, string password);
+    void Logout();
+    User? CurrentUser { get; }
+    string? CurrentToken { get; }
+    bool IsAuthenticated { get; }
 }
