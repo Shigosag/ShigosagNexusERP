@@ -1,146 +1,120 @@
+using System;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.ObjectModel;
-using System.Linq;
-using ShigosagNexusERP.Data;
-using ShigosagNexusERP.Models;
-using Microsoft.EntityFrameworkCore;
+using ShigosagNexusERP.Services;
 
 namespace ShigosagNexusERP.ViewModels;
 
-/// <summary>
-/// Main Shell ViewModel handling Global Navigation and Module Switching.
-/// Author: Shigosag | Offered by Shigosag
-/// </summary>
 public partial class MainViewModel : ViewModelBase
 {
     private readonly IServiceProvider _serviceProvider;
+    private readonly INotificationService _notifier;
+    private readonly IAuthService _authService;
 
     [ObservableProperty]
     private object? _currentView;
-    
-    // Tracking active button state for the "Sticky" sidebar selection
-    [ObservableProperty] 
+
+    [ObservableProperty]
     private string _activeViewName = "Dashboard";
 
-    public MainViewModel(IServiceProvider serviceProvider)
+    [ObservableProperty]
+    private string _toastMessage = string.Empty;
+
+    [ObservableProperty]
+    private bool _isToastVisible = false;
+
+    [ObservableProperty]
+    private string _toastColor = "#FF1493";
+
+    [ObservableProperty]
+    private string _authenticatedUser = "Administrator";
+
+    public MainViewModel(IServiceProvider serviceProvider, INotificationService notifier, IAuthService authService)
     {
         _serviceProvider = serviceProvider;
-        // Default entry point
+        _notifier = notifier;
+        _authService = authService;
+
+        _notifier.NotificationTriggered += OnNotificationTriggered;
+        AuthenticatedUser = _authService.CurrentUser?.Username ?? "Admin";
+
         NavigateToDashboard();
     }
 
-    // --- NAVIGATION COMMANDS (Fully Synchronized with DI Container) ---
-
-    [RelayCommand] 
-    public void NavigateToDashboard() 
-    { 
-        CurrentView = _serviceProvider.GetRequiredService<DashboardViewModel>(); 
-        ActiveViewName = "Dashboard"; 
-    }
-
-    [RelayCommand] 
-    public void NavigateToInventory() 
-    { 
-        CurrentView = _serviceProvider.GetRequiredService<InventoryViewModel>(); 
-        ActiveViewName = "Inventory"; 
-    }
-
-    [RelayCommand] 
-    public void NavigateToSales() 
-    { 
-        CurrentView = _serviceProvider.GetRequiredService<SalesViewModel>(); 
-        ActiveViewName = "Sales"; 
-    }
-    
-    [RelayCommand] 
-    public void NavigateToCRM() 
-    { 
-        CurrentView = _serviceProvider.GetRequiredService<CRMViewModel>(); 
-        ActiveViewName = "CRM"; 
-    }
-    
-    [RelayCommand] 
-    public void NavigateToHR() 
-    { 
-        CurrentView = _serviceProvider.GetRequiredService<HRViewModel>(); 
-        ActiveViewName = "HR"; 
-    }
-    
-    [RelayCommand] 
-    public void NavigateToFinance() 
-    { 
-        CurrentView = _serviceProvider.GetRequiredService<FinanceViewModel>(); 
-        ActiveViewName = "Finance"; 
-    }
-    
-    [RelayCommand] 
-    public void NavigateToSettings() 
-    { 
-        CurrentView = _serviceProvider.GetRequiredService<SettingsViewModel>(); 
-        ActiveViewName = "Settings"; 
-    }
-}
-
-// --- DATA-BACKED VIEWMODELS (Modernized for Enterprise Performance) ---
-
-public class SalesViewModel : ViewModelBase 
-{
-    public ObservableCollection<Order> Orders { get; }
-    public SalesViewModel() 
+    private void OnNotificationTriggered(string message, NotificationType type)
     {
-        try {
-            using var db = new AppDbContext();
-            // Fetching newest orders first for better UX
-            var data = db.Orders.AsNoTracking().OrderBy(x => x.Id).ToList();
-            Orders = new ObservableCollection<Order>(data);
-        } catch {
-            Orders = new ObservableCollection<Order>();
-        }
-    }
-}
+        ToastMessage = message;
+        ToastColor = type switch
+        {
+            NotificationType.Success => "#2ECC71",
+            NotificationType.Warning => "#F1C40F",
+            NotificationType.Error => "#E74C3C",
+            _ => "#FF1493"
+        };
+        IsToastVisible = true;
 
-public class CRMViewModel : ViewModelBase 
-{
-    public ObservableCollection<Customer> Customers { get; }
-    public CRMViewModel() 
+        System.Windows.Threading.DispatcherTimer timer = new() { Interval = TimeSpan.FromSeconds(3) };
+        timer.Tick += (s, e) =>
+        {
+            IsToastVisible = false;
+            timer.Stop();
+        };
+        timer.Start();
+    }
+
+    [RelayCommand]
+    public void DismissToast()
     {
-        try {
-            using var db = new AppDbContext();
-            var data = db.Customers.AsNoTracking().OrderBy(x => x.Name).ToList();
-            Customers = new ObservableCollection<Customer>(data);
-        } catch {
-            Customers = new ObservableCollection<Customer>();
-        }
+        IsToastVisible = false;
     }
-}
 
-public class HRViewModel : ViewModelBase 
-{
-    public ObservableCollection<Employee> Employees { get; }
-    public HRViewModel() 
+    [RelayCommand]
+    public void NavigateToDashboard()
     {
-        try {
-            using var db = new AppDbContext();
-            var data = db.Employees.AsNoTracking().OrderBy(x => x.Name).ToList();
-            Employees = new ObservableCollection<Employee>(data);
-        } catch {
-            Employees = new ObservableCollection<Employee>();
-        }
+        CurrentView = _serviceProvider.GetRequiredService<DashboardViewModel>();
+        ActiveViewName = "Dashboard";
     }
-}
 
-public class FinanceViewModel : ViewModelBase 
-{
-    public string ProfitMargin => "24.5%";
-    public string AnnualRevenue => "$1,240,500.00";
-    public string TaxLiability => "$45,200.00";
-}
+    [RelayCommand]
+    public void NavigateToInventory()
+    {
+        CurrentView = _serviceProvider.GetRequiredService<InventoryViewModel>();
+        ActiveViewName = "Inventory";
+    }
 
-public class SettingsViewModel : ViewModelBase 
-{
-    public string SystemVersion => "v1.0.4 - Production Stable";
-    public string DatabaseStatus => "Operational (Encrypted SQLite)";
+    [RelayCommand]
+    public void NavigateToSales()
+    {
+        CurrentView = _serviceProvider.GetRequiredService<SalesViewModel>();
+        ActiveViewName = "Sales";
+    }
+
+    [RelayCommand]
+    public void NavigateToCRM()
+    {
+        CurrentView = _serviceProvider.GetRequiredService<CRMViewModel>();
+        ActiveViewName = "CRM";
+    }
+
+    [RelayCommand]
+    public void NavigateToHR()
+    {
+        CurrentView = _serviceProvider.GetRequiredService<HRViewModel>();
+        ActiveViewName = "HR";
+    }
+
+    [RelayCommand]
+    public void NavigateToFinance()
+    {
+        CurrentView = _serviceProvider.GetRequiredService<FinanceViewModel>();
+        ActiveViewName = "Finance";
+    }
+
+    [RelayCommand]
+    public void NavigateToSettings()
+    {
+        CurrentView = _serviceProvider.GetRequiredService<SettingsViewModel>();
+        ActiveViewName = "Settings";
+    }
 }
