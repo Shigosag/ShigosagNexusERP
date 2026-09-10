@@ -11,14 +11,16 @@
                 <ResourceDictionary Source="Styles/ButtonStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-            <!-- 1. VECTOR ICON LIBRARY (High-Performance SVG Path Data) -->
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+
+            <!-- 1. VECTOR ICON LIBRARY -->
             <Geometry x:Key="IconDashboard">M13,3V9H21V3H13M13,21H21V11H13V21M3,21H11V15H3V21M3,13H11V3H3V13Z</Geometry>
             <Geometry x:Key="IconInventory">M20,18H4V4H20M20,2H4A2,2 0 0,0 2,4V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V4A2,2 0 0,0 20,2M18,17H6V15H18M18,13H6V11H18M18,9H6V7H18Z</Geometry>
             <Geometry x:Key="IconSales">M16,11.78L20.24,4.45L21.97,5.45L16.74,14.5L10.23,10.75L5.46,19H22V21H2V3H4V17.54L9.5,8L16,11.78Z</Geometry>
             <Geometry x:Key="IconCRM">M16,13C15.71,13 15.38,13 15.03,13.05C16.19,13.89 17,15 17,16.5V19H23V16.5C23,14.17 18.33,13 16,13M8,13C5.67,13 1,14.17 1,16.5V19H15V16.5C15,15 14.19,13.89 13.03,13.05C12.68,13 12.35,13 12,13H8M8,7A3,3 0 0,0 5,10A3,3 0 0,0 8,13A3,3 0 0,0 11,10A3,3 0 0,0 8,7M16,7A3,3 0 0,0 13,10A3,3 0 0,0 16,13A3,3 0 0,0 19,10A3,3 0 0,0 16,7Z</Geometry>
             <Geometry x:Key="IconHR">M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z</Geometry>
 
-            <!-- 2. STICKY NAV BUTTON STYLE (Updates selected state automatically) -->
+            <!-- 2. STICKY NAV BUTTON STYLE -->
             <Style x:Key="NavButtonStyle" TargetType="RadioButton">
                 <Setter Property="Height" Value="50"/>
                 <Setter Property="Margin" Value="0,2"/>
@@ -33,7 +35,6 @@
                                         <ColumnDefinition Width="4"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-                                    <!-- Selection Bar (Rose Pink) -->
                                     <Border x:Name="Indicator" Grid.Column="0" Background="{StaticResource PrimaryBrush}" 
                                             CornerRadius="2" Visibility="Collapsed" Margin="0,12"/>
                                     <ContentPresenter Grid.Column="1" VerticalAlignment="Center" Margin="15,0"/>
@@ -53,7 +54,7 @@
                 </Setter>
             </Style>
 
-            <!-- 3. MODERN DATAGRID STYLE (Modernizes all tables) -->
+            <!-- 3. MODERN DATAGRID STYLE -->
             <Style TargetType="DataGrid">
                 <Setter Property="Background" Value="Transparent"/>
                 <Setter Property="Foreground" Value="White"/>
@@ -63,7 +64,7 @@
                 <Setter Property="GridLinesVisibility" Value="None"/>
                 <Setter Property="FontSize" Value="13"/>
                 <Setter Property="VerticalContentAlignment" Value="Center"/>
-                <Setter Property="RowHeight" Value="50"/>
+                <Setter Property="RowHeight" Value="48"/>
                 <Setter Property="CanUserAddRows" Value="False"/>
                 <Setter Property="HeadersVisibility" Value="Column"/>
             </Style>
@@ -78,7 +79,6 @@
                 <Setter Property="BorderBrush" Value="#333333"/>
             </Style>
 
-            <!-- To center the text inside the cells -->
             <Style TargetType="DataGridCell">
                 <Setter Property="Template">
                     <Setter.Value>
@@ -91,7 +91,7 @@
                 </Setter>
             </Style>
 
-            <!-- 4. SEMANTIC STATUS STYLE (Color-coded triggers) -->
+            <!-- 4. SEMANTIC STATUS STYLE -->
             <Style x:Key="StatusTextStyle" TargetType="TextBlock">
                 <Setter Property="FontWeight" Value="Bold"/>
                 <Style.Triggers>
@@ -103,20 +103,38 @@
                 </Style.Triggers>
             </Style>
 
-            <!-- 5. NAVIGATION MAPPINGS -->
+            <!-- 5. NAVIGATION DATA TEMPLATES -->
             <DataTemplate DataType="{x:Type vm:DashboardViewModel}"><v:DashboardView/></DataTemplate>
             <DataTemplate DataType="{x:Type vm:InventoryViewModel}"><v:InventoryView/></DataTemplate>
+
+            <!-- 6. SALES MODULE TEMPLATE -->
             <DataTemplate DataType="{x:Type vm:SalesViewModel}">
-                <StackPanel Margin="20">
-                    <TextBlock Text="Sales Intelligence" FontSize="26" FontWeight="Black" Foreground="White" Margin="0,0,0,25"/>
-                    <DataGrid ItemsSource="{Binding Orders}" AutoGenerateColumns="False" Height="550">
+                <StackPanel Margin="10">
+                    <DockPanel Margin="0,0,0,20">
+                        <TextBlock Text="Sales &amp; Transaction Intelligence" FontSize="26" FontWeight="Black" Foreground="White" VerticalAlignment="Center"/>
+                        <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+                            <TextBox Width="100" Text="{Binding NewOrderAmount, UpdateSourceTrigger=PropertyChanged}" Background="#222" Foreground="White" Margin="5,0"/>
+                            <Button Content="+ Record Order" Style="{StaticResource ActionButtonStyle}" Command="{Binding CreateOrderCommand}"/>
+                        </StackPanel>
+                    </DockPanel>
+                    <DataGrid ItemsSource="{Binding Orders}" AutoGenerateColumns="False" Height="580">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="60"/>
-                            <DataGridTextColumn Header="DATE" Binding="{Binding OrderDate, StringFormat=d}" Width="150"/>
+                            <DataGridTextColumn Header="TRANSACTION ID" Binding="{Binding Id}" Width="120"/>
+                            <DataGridTextColumn Header="DATE" Binding="{Binding OrderDate, StringFormat='{}{0:yyyy-MM-dd HH:mm}'}" Width="160"/>
                             <DataGridTextColumn Header="TOTAL" Binding="{Binding TotalAmount, StringFormat=C}" Width="150"/>
-                            <DataGridTemplateColumn Header="STATUS" Width="*">
+                            <DataGridTextColumn Header="MEMO / NOTES" Binding="{Binding Notes}" Width="*"/>
+                            <DataGridTemplateColumn Header="STATUS" Width="140">
                                 <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate><TextBlock Text="{Binding Status}" Style="{StaticResource StatusTextStyle}" Margin="10,0"/></DataTemplate>
+                                    <DataTemplate><TextBlock Text="{Binding Status}" Style="{StaticResource StatusTextStyle}"/></DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="ACTIONS" Width="140">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Content="Settle Order" Style="{StaticResource ActionButtonStyle}" Height="28" Padding="6,2"
+                                                Command="{Binding DataContext.MarkCompletedCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                CommandParameter="{Binding}"/>
+                                    </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
                         </DataGrid.Columns>
@@ -124,32 +142,26 @@
                 </StackPanel>
             </DataTemplate>
 
-            <!-- 6. CRM MODULE -->
+            <!-- 7. CRM MODULE TEMPLATE -->
             <DataTemplate DataType="{x:Type vm:CRMViewModel}">
-                <StackPanel Margin="20">
-                    <TextBlock Text="CRM / Clients" FontSize="26" FontWeight="Black" Foreground="White" Margin="0,0,0,25"/>
-                    <DataGrid ItemsSource="{Binding Customers}" AutoGenerateColumns="False" Height="550">
+                <StackPanel Margin="10">
+                    <DockPanel Margin="0,0,0,20">
+                        <TextBlock Text="CRM / Client Directory" FontSize="26" FontWeight="Black" Foreground="White" VerticalAlignment="Center"/>
+                        <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+                            <TextBox Width="140" Text="{Binding NewCustomerName, UpdateSourceTrigger=PropertyChanged}" Background="#222" Foreground="White" Margin="4,0"/>
+                            <TextBox Width="160" Text="{Binding NewCustomerEmail, UpdateSourceTrigger=PropertyChanged}" Background="#222" Foreground="White" Margin="4,0"/>
+                            <Button Content="+ Register Client" Style="{StaticResource ActionButtonStyle}" Command="{Binding AddCustomerCommand}"/>
+                        </StackPanel>
+                    </DockPanel>
+                    <DataGrid ItemsSource="{Binding Customers}" AutoGenerateColumns="False" Height="580">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="CLIENT NAME" Binding="{Binding Name}" Width="250"/>
+                            <DataGridTextColumn Header="CLIENT NAME" Binding="{Binding Name}" Width="220"/>
+                            <DataGridTextColumn Header="COMPANY" Binding="{Binding Company}" Width="180"/>
                             <DataGridTextColumn Header="EMAIL" Binding="{Binding Email}" Width="*"/>
-                            <DataGridTextColumn Header="PHONE" Binding="{Binding Phone}" Width="200"/>
-                        </DataGrid.Columns>
-                    </DataGrid>
-                </StackPanel>
-            </DataTemplate>
-
-            <!-- 7. HR MODULE (With Semantic Status Colors) -->
-            <DataTemplate DataType="{x:Type vm:HRViewModel}">
-                <StackPanel Margin="20">
-                    <TextBlock Text="HR / Staff Directory" FontSize="26" FontWeight="Black" Foreground="White" Margin="0,0,0,25"/>
-                    <DataGrid ItemsSource="{Binding Employees}" AutoGenerateColumns="False" Height="550">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="NAME" Binding="{Binding Name}" Width="220"/>
-                            <DataGridTextColumn Header="DEPARTMENT" Binding="{Binding Department}" Width="150"/>
-                            <DataGridTextColumn Header="POSITION" Binding="{Binding Position}" Width="200"/>
-                            <DataGridTemplateColumn Header="STATUS" Width="*">
+                            <DataGridTextColumn Header="PHONE" Binding="{Binding Phone}" Width="180"/>
+                            <DataGridTemplateColumn Header="STATUS" Width="100">
                                 <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate><TextBlock Text="{Binding Status}" Style="{StaticResource StatusTextStyle}" Margin="10,0"/></DataTemplate>
+                                    <DataTemplate><TextBlock Text="{Binding Status}" Style="{StaticResource StatusTextStyle}"/></DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
                         </DataGrid.Columns>
@@ -157,53 +169,97 @@
                 </StackPanel>
             </DataTemplate>
 
-            <!-- FINANCE MODULE (Colorful KPI Digits) -->
+            <!-- 8. HR MODULE TEMPLATE -->
+            <DataTemplate DataType="{x:Type vm:HRViewModel}">
+                <StackPanel Margin="10">
+                    <DockPanel Margin="0,0,0,20">
+                        <TextBlock Text="Human Capital &amp; Staff Directory" FontSize="26" FontWeight="Black" Foreground="White" VerticalAlignment="Center"/>
+                        <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+                            <TextBox Width="160" Text="{Binding NewEmpName, UpdateSourceTrigger=PropertyChanged}" Background="#222" Foreground="White" Margin="4,0"/>
+                            <Button Content="+ Onboard Employee" Style="{StaticResource ActionButtonStyle}" Command="{Binding AddEmployeeCommand}"/>
+                        </StackPanel>
+                    </DockPanel>
+                    <DataGrid ItemsSource="{Binding Employees}" AutoGenerateColumns="False" Height="580">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="NAME" Binding="{Binding Name}" Width="200"/>
+                            <DataGridTextColumn Header="DEPARTMENT" Binding="{Binding Department}" Width="140"/>
+                            <DataGridTextColumn Header="POSITION" Binding="{Binding Position}" Width="200"/>
+                            <DataGridTemplateColumn Header="STATUS" Width="130">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate><TextBlock Text="{Binding Status}" Style="{StaticResource StatusTextStyle}"/></DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="TOGGLE" Width="140">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Content="Switch Status" Style="{StaticResource ActionButtonStyle}" Height="28" Padding="6,2"
+                                                Command="{Binding DataContext.ToggleStatusCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                CommandParameter="{Binding}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </StackPanel>
+            </DataTemplate>
+
+            <!-- 9. FINANCE MODULE -->
             <DataTemplate DataType="{x:Type vm:FinanceViewModel}">
                 <StackPanel Margin="20">
-                    <TextBlock Text="Financial Intelligence" FontSize="26" FontWeight="Black" Foreground="White" Margin="0,0,0,25"/>
+                    <TextBlock Text="Financial Intelligence &amp; Exposure" FontSize="26" FontWeight="Black" Foreground="White" Margin="0,0,0,25"/>
                     <UniformGrid Columns="3">
                         <Border Background="#1E1E1E" Padding="25" Margin="5" CornerRadius="12" BorderThickness="0,0,0,4" BorderBrush="LimeGreen">
                             <StackPanel>
                                 <TextBlock Text="ANNUAL REVENUE" Foreground="#888" FontSize="11" FontWeight="Bold"/>
                                 <TextBlock Text="{Binding AnnualRevenue}" FontSize="28" Foreground="White" FontWeight="Black" Margin="0,10"/>
+                                <TextBlock Text="Calculated Run Rate: " Foreground="#666" FontSize="10"/>
+                                <TextBlock Text="{Binding MonthlyRunRate}" Foreground="LimeGreen" FontSize="12" FontWeight="Bold"/>
                             </StackPanel>
                         </Border>
                         <Border Background="#1E1E1E" Padding="25" Margin="5" CornerRadius="12" BorderThickness="0,0,0,4" BorderBrush="{StaticResource PrimaryBrush}">
                             <StackPanel>
                                 <TextBlock Text="PROFIT MARGIN" Foreground="#888" FontSize="11" FontWeight="Bold"/>
                                 <TextBlock Text="{Binding ProfitMargin}" FontSize="28" Foreground="White" FontWeight="Black" Margin="0,10"/>
+                                <TextBlock Text="Operating Margin Tier: High" Foreground="#888" FontSize="10"/>
                             </StackPanel>
                         </Border>
                         <Border Background="#1E1E1E" Padding="25" Margin="5" CornerRadius="12" BorderThickness="0,0,0,4" BorderBrush="OrangeRed">
                             <StackPanel>
-                                <TextBlock Text="Tax Liability" Foreground="#888" FontSize="11" FontWeight="Bold"/>
+                                <TextBlock Text="ESTIMATED TAX LIABILITY" Foreground="#888" FontSize="11" FontWeight="Bold"/>
                                 <TextBlock Text="{Binding TaxLiability}" FontSize="28" Foreground="White" FontWeight="Black" Margin="0,10"/>
+                                <TextBlock Text="Corporate Rate: 3.6% Effective" Foreground="OrangeRed" FontSize="10"/>
                             </StackPanel>
                         </Border>
                     </UniformGrid>
                 </StackPanel>
             </DataTemplate>
 
-            <!-- SETTINGS MODULE -->
+            <!-- 10. SETTINGS MODULE -->
             <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
                 <StackPanel Margin="20">
-                    <TextBlock Text="System Configuration" FontSize="24" Foreground="White" Margin="0,0,0,20"/>
+                    <TextBlock Text="System Infrastructure &amp; Security" FontSize="26" FontWeight="Black" Foreground="White" Margin="0,0,0,20"/>
                     <Border Background="#1A1A1A" Padding="30" CornerRadius="15">
                         <StackPanel>
                             <Grid Margin="0,10">
-                                <TextBlock Text="Application Version" Foreground="#888"/>
-                                <TextBlock Text="{Binding SystemVersion}" Foreground="White" HorizontalAlignment="Right"/>
+                                <TextBlock Text="Active Platform Core" Foreground="#888"/>
+                                <TextBlock Text="{Binding SystemVersion}" Foreground="White" HorizontalAlignment="Right" FontWeight="SemiBold"/>
                             </Grid>
                             <Separator Background="#333"/>
                             <Grid Margin="0,10">
-                                <TextBlock Text="Database Connectivity" Foreground="#888"/>
-                                <TextBlock Text="{Binding DatabaseStatus}" Foreground="LimeGreen" HorizontalAlignment="Right"/>
+                                <TextBlock Text="Database Connectivity Status" Foreground="#888"/>
+                                <TextBlock Text="{Binding DatabaseStatus}" Foreground="LimeGreen" HorizontalAlignment="Right" FontWeight="Bold"/>
                             </Grid>
                             <Separator Background="#333"/>
                             <Grid Margin="0,10">
-                                <TextBlock Text="Global Branding" Foreground="#888"/>
-                                <TextBlock Text="SHIGOSAG NEXUS" Foreground="{StaticResource PrimaryBrush}" FontWeight="Bold" HorizontalAlignment="Right"/>
+                                <TextBlock Text="Active JWT Operator Identity" Foreground="#888"/>
+                                <TextBlock Text="{Binding CurrentOperator}" Foreground="White" HorizontalAlignment="Right"/>
                             </Grid>
+                            <Separator Background="#333"/>
+                            <Grid Margin="0,10">
+                                <TextBlock Text="Session Bearer Token Preview" Foreground="#888"/>
+                                <TextBlock Text="{Binding ActiveTokenPreview}" Foreground="{StaticResource PrimaryBrush}" HorizontalAlignment="Right" FontFamily="Consolas"/>
+                            </Grid>
+                            <Button Content="Verify Infrastructure Health" Style="{StaticResource ActionButtonStyle}" HorizontalAlignment="Right" Margin="0,20,0,0" Command="{Binding VerifyStatusCommand}"/>
                         </StackPanel>
                     </Border>
                 </StackPanel>
