@@ -1,22 +1,72 @@
 <UserControl x:Class="ShigosagNexusERP.Views.InventoryView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <Grid>
+    <Grid Margin="10">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        
-        <TextBlock Grid.Row="0" Text="Inventory Management" Style="{StaticResource HeaderStyle}" Margin="0,0,0,20"/>
-        
-        <DataGrid Grid.Row="1" ItemsSource="{Binding Products}" AutoGenerateColumns="False" 
-                  Background="Transparent" BorderThickness="0" RowBackground="#1E1E1E" 
-                  Foreground="White" HorizontalGridLinesBrush="#333" VerticalGridLinesBrush="#333">
+
+        <!-- Header and Search Filter Bar -->
+        <DockPanel Grid.Row="0" Margin="0,0,0,20">
+            <TextBlock Text="Inventory &amp; Asset Management" FontSize="26" FontWeight="Black" Foreground="White" VerticalAlignment="Center"/>
+            <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+                <TextBox Width="240" Height="36" Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}"
+                         Background="#1A1A1A" Foreground="White" BorderBrush="#333" Padding="8,4" VerticalContentAlignment="Center" Margin="0,0,10,0"/>
+                <Button Content="All" Style="{StaticResource ActionButtonStyle}" Margin="2,0" Command="{Binding FilterByCategoryCommand}" CommandParameter="All"/>
+                <Button Content="Hardware" Style="{StaticResource ActionButtonStyle}" Margin="2,0" Command="{Binding FilterByCategoryCommand}" CommandParameter="Hardware"/>
+                <Button Content="Software" Style="{StaticResource ActionButtonStyle}" Margin="2,0" Command="{Binding FilterByCategoryCommand}" CommandParameter="Software"/>
+                <Button Content="Accessories" Style="{StaticResource ActionButtonStyle}" Margin="2,0" Command="{Binding FilterByCategoryCommand}" CommandParameter="Accessories"/>
+            </StackPanel>
+        </DockPanel>
+
+        <!-- Quick Item Registration Panel -->
+        <Border Grid.Row="1" Background="#161616" CornerRadius="12" Padding="15" Margin="0,0,0,20">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="1.5*"/>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1.5*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBox Grid.Column="0" Text="{Binding NewProductName, UpdateSourceTrigger=PropertyChanged}" Margin="5" Padding="6" Background="#222" Foreground="White" BorderBrush="#444"/>
+                <TextBox Grid.Column="1" Text="{Binding NewProductSku, UpdateSourceTrigger=PropertyChanged}" Margin="5" Padding="6" Background="#222" Foreground="White" BorderBrush="#444"/>
+                <TextBox Grid.Column="2" Text="{Binding NewProductPrice, UpdateSourceTrigger=PropertyChanged}" Margin="5" Padding="6" Background="#222" Foreground="White" BorderBrush="#444"/>
+                <TextBox Grid.Column="3" Text="{Binding NewProductStock, UpdateSourceTrigger=PropertyChanged}" Margin="5" Padding="6" Background="#222" Foreground="White" BorderBrush="#444"/>
+                <TextBox Grid.Column="4" Text="{Binding NewProductCategory, UpdateSourceTrigger=PropertyChanged}" Margin="5" Padding="6" Background="#222" Foreground="White" BorderBrush="#444"/>
+
+                <Button Grid.Column="5" Content="+ Add Item" Style="{StaticResource ActionButtonStyle}" Margin="5" Command="{Binding AddProductCommand}"/>
+            </Grid>
+        </Border>
+
+        <!-- Dynamic Product DataGrid -->
+        <DataGrid Grid.Row="2" ItemsSource="{Binding Products}" SelectedItem="{Binding SelectedProduct}" AutoGenerateColumns="False">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="SKU" Binding="{Binding SKU}" Width="120"/>
-                <DataGridTextColumn Header="Product Name" Binding="{Binding Name}" Width="*"/>
-                <DataGridTextColumn Header="Stock" Binding="{Binding StockLevel}" Width="100"/>
-                <DataGridTextColumn Header="Price" Binding="{Binding Price, StringFormat=C}" Width="120"/>
+                <DataGridTextColumn Header="PRODUCT NAME" Binding="{Binding Name}" Width="*"/>
+                <DataGridTextColumn Header="CATEGORY" Binding="{Binding Category}" Width="140"/>
+                <DataGridTextColumn Header="STOCK LEVEL" Binding="{Binding StockLevel}" Width="110"/>
+                <DataGridTextColumn Header="PRICE" Binding="{Binding Price, StringFormat=C}" Width="120"/>
+
+                <!-- Actions Column -->
+                <DataGridTemplateColumn Header="ACTIONS" Width="150">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <Button Content="+1" Style="{StaticResource ActionButtonStyle}" Height="28" Padding="6,2" Margin="2,0" 
+                                        Command="{Binding DataContext.IncrementStockCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                        CommandParameter="{Binding}"/>
+                                <Button Content="Archive" Background="#442222" Foreground="#FF6666" BorderThickness="0" Height="28" Padding="6,2" Margin="2,0"
+                                        Command="{Binding DataContext.DeleteProductCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                        CommandParameter="{Binding}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
     </Grid>

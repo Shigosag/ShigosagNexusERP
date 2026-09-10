@@ -1,5 +1,8 @@
 using System;
+using System.IO;
 using System.Windows;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ShigosagNexusERP.Data;
 using ShigosagNexusERP.Services;
@@ -8,39 +11,43 @@ using ShigosagNexusERP.Views;
 
 namespace ShigosagNexusERP;
 
-/// <summary>
-/// Interaction logic for App.xaml
-/// Handles Dependency Injection, Startup Sequence, and Global Error Logging.
-/// Author: Shigosag
-/// </summary>
 public partial class App : Application
 {
     private readonly ServiceProvider _serviceProvider;
+    private readonly IConfiguration _configuration;
 
     public App()
     {
-        // 1. GLOBAL UI EXCEPTION HANDLER
-        // Catches unexpected UI crashes and provides a diagnostic message.
         this.DispatcherUnhandledException += (s, e) =>
         {
-            MessageBox.Show($"System Activity Error: {e.Exception.Message}", 
-                            "Shigosag Nexus - UI Exception", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show($"Activity Subsystem Fault: {e.Exception.Message}", 
+                            "Nexus Runtime Diagnostics", MessageBoxButton.OK, MessageBoxImage.Error);
             e.Handled = true;
         };
 
+        var builder = new ConfigurationBuilder()
+            .SetBasePath(AppContext.BaseDirectory)
+            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+
+        _configuration = builder.Build();
+
         var services = new ServiceCollection();
 
-        // 2. INFRASTRUCTURE & PERSISTENCE
-        services.AddDbContext<AppDbContext>();
-        services.AddSingleton<IAuthService, AuthService>();
-        services.AddSingleton<IDataService, DataService>();
+        // 1. Persist Configuration in DI
+        services.AddSingleton<IConfiguration>(_configuration);
 
-        // 3. VIEWMODEL REGISTRATION (All Modules)
-        // Main Shell
+        // 2. Database Context Registration
+        services.AddDbContext<AppDbContext>();
+
+        // 3. Security, Tokenization, and Notifications
+        services.AddSingleton<IJwtTokenService, JwtTokenService>();
+        services.AddSingleton<IAuthService, AuthService>();
+        services.AddSingleton<INotificationService, NotificationService>();
+        services.AddScoped<IDataService, DataService>();
+
+        // 4. ViewModels
         services.AddSingleton<MainViewModel>();
-        
-        // Transient views ensure data is fresh every time the user clicks the sidebar
-        services.AddTransient<DashboardViewModel>(); 
+        services.AddTransient<DashboardViewModel>();
         services.AddTransient<InventoryViewModel>();
         services.AddTransient<SalesViewModel>();
         services.AddTransient<CRMViewModel>();
@@ -48,8 +55,8 @@ public partial class App : Application
         services.AddTransient<FinanceViewModel>();
         services.AddTransient<SettingsViewModel>();
 
-        // 4. MAIN UI WINDOW
-        services.AddSingleton<MainWindow>(s => new MainWindow()
+        // 5. Windows
+        services.AddSingleton<MainWindow>(s => new MainWindow
         {
             DataContext = s.GetRequiredService<MainViewModel>()
         });
@@ -57,35 +64,29 @@ public partial class App : Application
         _serviceProvider = services.BuildServiceProvider();
     }
 
-    protected override void OnStartup(StartupEventArgs e)
+    protected override async void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
 
         try
         {
-            // 5. NEXUS BOOTLOADER SEQUENCE
-            // Pre-seeds the database and verifies infrastructure integrity
             using (var scope = _serviceProvider.CreateScope())
             {
                 var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-                
-                // Ensures the SQLite file and Enterprise tables exist
-                context.Database.EnsureCreated();
-                
-                // Populates the corporate records (Employees, Orders, etc.)
                 DbInitializer.Seed(context);
+
+                // Authenticate default administrator and acquire JWT token
+                var auth = scope.ServiceProvider.GetRequiredService<IAuthService>();
+                await auth.LoginAsync("admin", "admin123");
             }
 
-            // 6. LAUNCH COMMAND CENTER
             var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
             mainWindow.Show();
         }
         catch (Exception ex)
         {
-            // Explicit error message if the database is locked or the boot sequence fails
-            MessageBox.Show($"Nexus Bootloader Failure: {ex.Message}\n\nTrace: {ex.InnerException?.Message}", 
-                            "Critical System Error", MessageBoxButton.OK, MessageBoxImage.Hand);
-            
+            MessageBox.Show($"Nexus Bootloader Exception: {ex.Message}\nTrace: {ex.InnerException?.Message}",
+                            "Critical Boot Failure", MessageBoxButton.OK, MessageBoxImage.Hand);
             Shutdown();
         }
     }
