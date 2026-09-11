@@ -9,6 +9,8 @@
         Background="#0F0F0F" WindowStartupLocation="CenterScreen">
 
     <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+
         <Style x:Key="SidebarIconStyle" TargetType="Path">
             <Setter Property="Fill" Value="#AAAAAA"/>
             <Setter Property="Stretch" Value="Uniform"/>
@@ -118,7 +120,7 @@
                 <ContentControl Content="{Binding CurrentView}"/>
             </Grid>
 
-            <!-- Modern Non-blocking Toast Notification (Replaces Browser/System Message Dialogs) -->
+            <!-- Modern Non-blocking Toast Notification -->
             <Border Grid.Row="1" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,15,30,0"
                     Background="#222222" CornerRadius="10" Padding="16,12" BorderThickness="1.5"
                     BorderBrush="{Binding ToastColor}" MaxWidth="450"
