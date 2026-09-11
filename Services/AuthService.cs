@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using ShigosagNexusERP.Data;
 using ShigosagNexusERP.Models;
 
@@ -8,16 +9,16 @@ namespace ShigosagNexusERP.Services;
 
 public class AuthService : IAuthService
 {
-    private readonly AppDbContext _db;
+    private readonly IServiceScopeFactory _scopeFactory;
     private readonly IJwtTokenService _jwtService;
 
     public User? CurrentUser { get; private set; }
     public string? CurrentToken { get; private set; }
     public bool IsAuthenticated => !string.IsNullOrEmpty(CurrentToken) && _jwtService.IsTokenValid(CurrentToken);
 
-    public AuthService(AppDbContext db, IJwtTokenService jwtService)
+    public AuthService(IServiceScopeFactory scopeFactory, IJwtTokenService jwtService)
     {
-        _db = db;
+        _scopeFactory = scopeFactory;
         _jwtService = jwtService;
     }
 
@@ -25,7 +26,10 @@ public class AuthService : IAuthService
     {
         try
         {
-            var user = await _db.Users.FirstOrDefaultAsync(u => u.Username.ToLower() == username.ToLower());
+            using var scope = _scopeFactory.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+            var user = await db.Users.FirstOrDefaultAsync(u => u.Username.ToLower() == username.ToLower());
             if (user == null)
             {
                 return new AuthResult(false, null, null, "Invalid credentials provided.");
@@ -37,7 +41,7 @@ public class AuthService : IAuthService
             }
 
             user.LastLoginAt = DateTime.UtcNow;
-            await _db.SaveChangesAsync();
+            await db.SaveChangesAsync();
 
             var token = _jwtService.GenerateToken(user);
             CurrentUser = user;
