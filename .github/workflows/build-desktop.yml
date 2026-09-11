@@ -1,0 +1,50 @@
+name: Build Desktop Application
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      # 1. Pull down repository code
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 2. Set up .NET 8 in the GitHub Cloud Runner
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      # 3. Restore all NuGet packages (EF Core, JWT, BCrypt, etc.)
+      - name: Restore Dependencies
+        run: dotnet restore ShigosagNexusERP.csproj
+
+      # 4. Verify compilation and dependencies
+      - name: Compile and Test Build
+        run: dotnet build ShigosagNexusERP.csproj --configuration Release --no-restore
+
+      # 5. Publish as a zero-dependency portable executable
+      - name: Publish Single-File Executable
+        run: >
+          dotnet publish ShigosagNexusERP.csproj
+          -c Release
+          -r win-x64
+          --self-contained true
+          -p:PublishSingleFile=true
+          -p:IncludeNativeLibrariesForSelfExtract=true
+          -p:EnableCompressionInSingleFile=true
+          -o ./publish
+
+      # 6. Upload the executable as an artifact you can download
+      - name: Upload Test Executable
+        uses: actions/upload-artifact@v4
+        with:
+          name: ShigosagNexusERP-Windows
+          path: ./publish/ShigosagNexusERP.exe
