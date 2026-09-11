@@ -36,14 +36,14 @@ public partial class App : Application
         // 1. Persist Configuration in DI
         services.AddSingleton<IConfiguration>(_configuration);
 
-        // 2. Database Context Registration
-        services.AddDbContext<AppDbContext>();
+        // 2. Database Context Registration (Transient avoids lifetime mismatch in desktop WPF)
+        services.AddDbContext<AppDbContext>(ServiceLifetime.Transient);
 
         // 3. Security, Tokenization, and Notifications
         services.AddSingleton<IJwtTokenService, JwtTokenService>();
         services.AddSingleton<IAuthService, AuthService>();
         services.AddSingleton<INotificationService, NotificationService>();
-        services.AddScoped<IDataService, DataService>();
+        services.AddTransient<IDataService, DataService>();
 
         // 4. ViewModels
         services.AddSingleton<MainViewModel>();
