@@ -48,6 +48,8 @@
 
 ## 🗂️ Project Structure
 
+[![Architecture Diagram](https://img.shields.io/badge/View-GitDiagram-blue)](https://gitdiagram.com/Shigosag/ShigosagNexusERP)
+
 ```txt
 ShigosagNexusERP/
 ├── ShigosagNexusERP.csproj
